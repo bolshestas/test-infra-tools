@@ -1,5 +1,6 @@
 const db = require('../persistence');
-const {v4 : uuid} = require('uuid');
+const { publishEvent } = require('../kafka');
+const { v4: uuid } = require('uuid');
 
 module.exports = async (req, res) => {
     const item = {
@@ -9,5 +10,7 @@ module.exports = async (req, res) => {
     };
 
     await db.storeItem(item);
+    await publishEvent('todo.created', item);
+
     res.send(item);
 };

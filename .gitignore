@@ -1,0 +1,13 @@
+
+node_modules/
+
+# Local Kubernetes secrets
+kuber/app-secret.yaml
+kuber/mysql-secret.yaml
+
+# Local environment files and private keys
+.env
+.env.*
+!.env.example
+*.pem
+*.key

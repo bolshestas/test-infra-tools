@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-event-consumer
+  namespace: default
+  labels:
+    app: todo-event-consumer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: todo-event-consumer
+  template:
+    metadata:
+      labels:
+        app: todo-event-consumer
+    spec:
+      containers:
+        - name: consumer
+          image: getting-started:1.4
+          imagePullPolicy: Never
+          command:
+            - node
+            - src/consumer.js
+          env:
+            - name: KAFKA_BROKERS
+              value: my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
+            - name: KAFKA_TOPIC
+              value: todo-events
+            - name: KAFKA_GROUP_ID
+              value: todo-audit-workers
+            - name: KAFKAJS_NO_PARTITIONER_WARNING
+              value: "1"
+            - name: NODE_OPTIONS
+              value: --disable-warning=TimeoutNegativeWarning
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
