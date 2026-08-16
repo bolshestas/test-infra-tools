@@ -45,4 +45,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t getting-started:ci .
+        run: docker build -t $REGISTRY/$IMAGE_NAME:$GITHUB_SHA .
+
+      - name: Push Docker image
+        if: github.event_name == 'push'
+        run: docker push $REGISTRY/$IMAGE_NAME:$GITHUB_SHA
