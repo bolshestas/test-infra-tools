@@ -66,6 +66,12 @@ spec:
             - mountPath: /etc/grafana/provisioning/datasources
               name: grafana-datasource
               readOnly: true
+            - mountPath: /etc/grafana/provisioning/dashboards
+              name: grafana-dashboard-provider
+              readOnly: true
+            - mountPath: /etc/grafana/dashboards
+              name: grafana-dashboard-todo-app
+              readOnly: true
       volumes:
         - name: grafana-pv
           persistentVolumeClaim:
@@ -73,6 +79,12 @@ spec:
         - name: grafana-datasource
           configMap:
             name: grafana-datasource
+        - name: grafana-dashboard-provider
+          configMap:
+            name: grafana-dashboard-provider
+        - name: grafana-dashboard-todo-app
+          configMap:
+            name: grafana-dashboard-todo-app
 ---
 apiVersion: v1
 kind: Service
