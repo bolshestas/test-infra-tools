@@ -50,3 +50,18 @@ jobs:
       - name: Push Docker image
         if: github.event_name == 'push'
         run: docker push $REGISTRY/$IMAGE_NAME:$GITHUB_SHA
+
+      - name: Checkout Gitops repository
+        if: github.event_name == 'push'
+        uses: actions/checkout@v6
+        with:
+          repository: bolshestas/test-infra-gitops
+          path: gitops
+          persist-credentials: false
+
+      - name: Verify GitOps manifests
+        if: github.event_name == 'push'
+        run: |
+          grep -nE 'image:|imagePullPolicy:' \
+            gitops/apps/todo/base/app-deployment.yaml \
+            gitops/apps/todo/base/app-consumer-deployment.yaml
