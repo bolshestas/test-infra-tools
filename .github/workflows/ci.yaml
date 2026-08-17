@@ -65,3 +65,26 @@ jobs:
           grep -nE 'image:|imagePullPolicy:' \
             gitops/apps/todo/base/app-deployment.yaml \
             gitops/apps/todo/base/app-consumer-deployment.yaml
+
+      - name: Update GitOps image references
+        if: github.event_name == 'push'
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: |
+          for file in \
+            gitops/apps/todo/base/app-deployment.yaml \
+            gitops/apps/todo/base/app-consumer-deployment.yaml
+          do
+            sed -i -E \
+              "s#^([[:space:]]*)image: (getting-started:[^[:space:]]+|ghcr.io/bolshestas/test-infra-tools:[^[:space:]]+)#\1image: ${IMAGE}#" \
+              "$file"
+
+            grep -qF "image: ${IMAGE}" "$file"
+          done
+      - name: Show GitOps diff
+        if: github.event_name == 'push'
+        run: |
+          git -C gitops diff --check
+          git -C gitops diff -- \
+            apps/todo/base/app-deployment.yaml \
+            apps/todo/base/app-consumer-deployment.yaml
