@@ -56,8 +56,8 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: bolshestas/test-infra-gitops
+          token: ${{ secrets.GITOPS_TOKEN }}
           path: gitops
-          persist-credentials: false
 
       - name: Verify GitOps manifests
         if: github.event_name == 'push'
@@ -88,3 +88,7 @@ jobs:
           git -C gitops diff -- \
             apps/todo/base/app-deployment.yaml \
             apps/todo/base/app-consumer-deployment.yaml
+
+      - name: Verify GitOps push access
+        if: github.event_name == 'push'
+        run: git -C gitops push --dry-run origin HEAD:main
