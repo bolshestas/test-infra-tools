@@ -89,6 +89,20 @@ jobs:
             apps/todo/base/app-deployment.yaml \
             apps/todo/base/app-consumer-deployment.yaml
 
-      - name: Verify GitOps push access
+      - name: Commit and push GitOps update
         if: github.event_name == 'push'
-        run: git -C gitops push --dry-run origin HEAD:main
+        run: |
+          git -C gitops config user.name "github-actions[bot]"
+          git -C gitops config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git -C gitops diff --quiet; then
+            echo "No GitOps changes to commit"
+            exit 0
+          fi
+
+          git -C gitops add \
+            apps/todo/base/app-deployment.yaml \
+            apps/todo/base/app-consumer-deployment.yaml
+
+          git -C gitops commit -m "deploy app ${GITHUB_SHA}"
+          git -C gitops push origin HEAD:main
